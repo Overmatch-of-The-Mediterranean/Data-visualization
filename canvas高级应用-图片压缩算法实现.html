@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <input type="file" id="upload">
+    <script>
+        // 1.检查文件格式
+        // 2.将图片转换为base64格式
+        // 3.压缩图片
+        // 4.将压缩后的图片画到画板上
+        const upload = document.getElementById('upload')
+        const Max = 3 * 1024 * 1024
+        const Max_Str = '3MB'
+        const type = ['image/jpg', 'image/png', 'image/jpeg']
+        // 压缩算法
+        const compress = (base64, callback) => {
+            let MaxW = 1024
+            let MaxH = 1024
+            const image = new Image()
+            // 监听图片上传，上传完后进行压缩，绘图操作
+            image.addEventListener('load', () => {
+                let isCompress = false
+                let ratio = 1
+                if (MaxW < image.naturalWidth) {
+                    isCompress = true
+                    ratio = image.naturalWidth / MaxW
+                    MaxH = image.naturalHeight / ratio
+                }
+                if (MaxH < image.naturalHeight) {
+                    isCompress = true
+                    ratio = image.naturalHeight / MaxH
+                    MaxW = image.naturalWidth / ratio
+                }
+                if (!isCompress) {
+                    MaxW = image.naturalWidth
+                    MaxH = image.naturalHeight
+                }
+                // 创建画板添加到html上
+                const canvas = document.createElement('canvas')
+                canvas.setAttribute('id', '__compress__')
+                canvas.width = MaxW
+                canvas.height = MaxH
+                canvas.style.visibility = 'hidden'
+                document.body.appendChild(canvas)
+
+                // 添加画板后，获取画板对象，将压缩过的图片画到画板上
+                const ctx = canvas.getContext('2d')
+                ctx.clearRect(0, 0, MaxW, MaxH) // 画之前先清理画板
+                ctx.drawImage(image, 0, 0, MaxW, MaxH) // 画体积压缩后的图片
+                const compressImage = canvas.toDataURL('image/jpeg', 0.5) // 将图片空间大小进行压缩
+                callback && callback(compressImage) // 将压缩的图片发送到服务器
+                const _image = new Image
+                _image.src = compressImage
+                document.body.appendChild(_image)
+                console.log('压缩比', image.src.length / _image.src.length);
+                canvas.remove()
+            })
+            // 压缩前的图片
+            image.src = base64
+            document.body.appendChild(image)
+
+        }
+        // 将压缩的图片发送到服务器的函数
+        function uploadToServer (compressImage) {
+            console.log('upload to server......');
+        }
+        // 将检查后的图片，转化成base64格式并压缩的函数
+        const convertImageToBase64 = (file, callback) => {
+            let reader = new FileReader()
+            // 监听文件的读取，读取上传的文件完毕后，进行压缩操作
+            reader.addEventListener('load', (e) => {
+                const base64 = e.target.result
+                callback && callback(base64)
+                reader = null
+            })
+            reader.readAsDataURL(file)
+        }
+        // 监听上传的文件，上传好后执行一系列操作
+        upload.addEventListener('change', (e) => {
+            const [file] = e.target.files
+            console.log(file);
+            if (!type.includes(file.type)) {
+                alert(`不支持${file.type}类型`)
+                upload.value = ''
+                return
+            }
+            if (file.size > Max) {
+                alert(`图片大小不能超过${Max_Str}`)
+                upload.value = ''
+                return
+            }
+            // 检验完图片后，先将图片转为base64格式再压缩
+            convertImageToBase64(file, (base64) => compress(base64, uploadToServer))
+        })
+    </script>
+</body>
+
+</html>
