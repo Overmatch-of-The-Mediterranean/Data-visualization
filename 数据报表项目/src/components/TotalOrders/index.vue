@@ -2,7 +2,7 @@
     <div>
         <common-card title="累计订单量" value="2,928,474">
             <template>
-                <v-chart :option="getOptions()"></v-chart>
+                <v-chart :options="getOptions()" :style="{width:'100%',height:'100%'}"></v-chart>
             </template>
             <template v-slot:footer>
                 <span>昨日订单量</span>

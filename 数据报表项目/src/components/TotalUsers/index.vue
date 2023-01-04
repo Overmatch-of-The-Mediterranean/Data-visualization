@@ -2,7 +2,7 @@
     <div>
         <common-card title="累计用户数" value="1,477,088">
             <template>
-                <v-chart :option="getOptions()"></v-chart>
+                <v-chart :options="getOptions()" :style="{width:'100%',height:'100%'}"></v-chart>
             </template>
             <template v-slot:footer>
                 <div class="total-users-footer">

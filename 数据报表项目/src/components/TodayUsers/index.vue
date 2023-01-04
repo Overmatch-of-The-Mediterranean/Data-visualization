@@ -2,7 +2,7 @@
     <div>
         <common-card title="今日交易用户数" value="456,558">
             <template>
-                <v-chart :option="getOptions()"></v-chart>
+                <v-chart :options="getOptions()" :style="{width:'100%',height:'100%'}"></v-chart>
             </template>
             <template v-slot:footer>
                 <span>退货率 </span>
