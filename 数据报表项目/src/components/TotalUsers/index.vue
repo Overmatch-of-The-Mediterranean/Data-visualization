@@ -1,16 +1,16 @@
 <template>
     <div>
-        <common-card title="累计用户数" value="1,477,088">
+        <common-card title="累计用户数" :value="userToday">
             <template>
                 <v-chart :options="getOptions()" :style="{width:'100%',height:'100%'}"></v-chart>
             </template>
             <template v-slot:footer>
                 <div class="total-users-footer">
                     <span>日同比</span>
-                    <span class="emphsis">47.65%</span>
+                    <span class="emphsis">{{ userGrowthLastDay }}</span>
                     <div class="increace"></div>
                     <span class="mouth">月同比</span>
-                    <span class="emphsis">84.57%</span>
+                    <span class="emphsis">{{ userGrowthLastMonth }}%</span>
                     <div class="decreace"></div>
                 </div>
             </template>
@@ -20,9 +20,11 @@
 
 <script>
 import commonCardMixin from '../../mixins/commonCardMixin'
+import commonDataMixin from '../../mixins/commonDataMixin'
+
 export default {
     name: 'TotalUsers',
-    mixins: [commonCardMixin],
+    mixins: [commonCardMixin, commonDataMixin],
     methods: {
         getOptions () {
             return {
@@ -42,8 +44,9 @@ export default {
                 },
                 series: [
                     {
+                        name: '上月平台用户数',
                         type: 'bar',
-                        data: [200],
+                        data: [this.userLastMonth],
                         stack: '总量',
                         itemStyle: {
                             color: '#45c946'
@@ -51,8 +54,9 @@ export default {
                         barWidth: '10px'
                     },
                     {
+                        name: '今日平台用户数',
                         type: 'bar',
-                        data: [250],
+                        data: [this.userTodayNumber],
                         stack: '总量',
                         itemStyle: {
                             color: '#eee'
@@ -60,7 +64,7 @@ export default {
                     },
                     {
                         type: 'custom',
-                        data: [200],
+                        data: [this.userLastMonth],
                         stack: '总量',
                         renderItem: (params, api) => {
                             const value = api.value(0)

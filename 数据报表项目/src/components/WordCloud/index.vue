@@ -3,57 +3,32 @@
 </template>
 
 <script>
+import commonDataMixin from '../../mixins/commonDataMixin'
 export default {
     name: 'WordCloud',
+    mixins: [commonDataMixin],
     data () {
         return {
-            chartData: {
-                columns: ['name', 'value'],
-                rows: [
-                    {
-                        name: '慕课网1',
-                        value: 100 * Math.random()
-                    },
-                    {
-                        name: '慕课网2',
-                        value: 100 * Math.random()
-                    },
-                    {
-                        name: '慕课网3',
-                        value: 100 * Math.random()
-                    },
-                    {
-                        name: '慕课网4',
-                        value: 100 * Math.random()
-                    },
-                    {
-                        name: '慕课网5',
-                        value: 100 * Math.random()
-                    },
-                    {
-                        name: '慕课网6',
-                        value: 100 * Math.random()
-                    },
-                    {
-                        name: '慕课网7',
-                        value: 100 * Math.random()
-                    },
-                    {
-                        name: '慕课网8',
-                        value: 100 * Math.random()
-                    },
-                    {
-                        name: '慕课网9',
-                        value: 100 * Math.random()
-                    },
-                    {
-                        name: '慕课网10',
-                        value: 100 * Math.random()
-                    }
-                ]
-            },
+            chartData: {},
             chartSetting: {
                 color: ['rgba(97,216,0,.7)', 'rgba(204,178,26,.7)', 'rgba(245,166,35,.7)', 'rgba(156,13,113,.7)']
+            }
+        }
+    },
+    watch: {
+        // 转换为合适的词云数据
+        wordcloud () {
+            const data = []
+            this.wordcloud.forEach(item => {
+                data.push({
+                    name: item.word,
+                    value: item.count
+                })
+            })
+            // 词云显示所需的数据
+            this.chartData = {
+                columns: ['name', 'value'],
+                rows: data
             }
         }
     }

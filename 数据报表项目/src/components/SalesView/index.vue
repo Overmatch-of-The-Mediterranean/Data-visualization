@@ -24,7 +24,7 @@
                     <div class="sales-view-list">
                         <div class="sales-view-title">排行榜</div>
                         <div class="list-item-wrapper">
-                            <div class="list-item" v-for="item in rank" :key="item.no">
+                            <div class="list-item" v-for="item in rankData" :key="item.no">
                                 <div :class="['list-item-no',+item.no<=3 ? 'top-no':'']">{{item.no}}</div>
                                 <div class="list-item-name">{{item.name}}</div>
                                 <div class="list-item-money">{{item.money}}</div>
@@ -38,6 +38,7 @@
 </template>
 
 <script>
+import commonDataMixin from '../../mixins/commonDataMixin'
 export default {
     name: 'SalesView',
     data () {
@@ -77,10 +78,37 @@ export default {
                     }
                 ]
             },
-            chartOption: {
+            chartOption: {}
+        }
+    },
+    mixins: [commonDataMixin],
+    computed: {
+        // 根据左边的图标，显示右边不同的排行榜数据
+        rankData () {
+            return this.activeIndex === '1' ? this.orderRank : this.userRank
+        }
+    },
+    watch: {
+        orderFullYear () {
+            this.render(this.orderFullYear, this.orderFullYearAxis, '年度销售额')
+        }
+    },
+    methods: {
+        // 切换sales左边的图表触发的事件
+        onMenuSelect (index) {
+            this.activeIndex = index
+            if (index === '1') {
+                this.render(this.orderFullYear, this.orderFullYearAxis, '年度销售额')
+            } else {
+                this.render(this.userFullYear, this.userFullYearAxis, '年度用户访问量')
+            }
+        },
+        // 渲染sales左边的图表
+        render (data, axis, title) {
+            this.chartOption = {
                 color: ['#3398DB'],
                 title: {
-                    text: '年度销售业绩数据',
+                    text: title,
                     textStyle: {
                         fontSize: 12,
                         color: '#666'
@@ -90,7 +118,7 @@ export default {
                 },
                 xAxis: {
                     type: 'category',
-                    data: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+                    data: axis,
                     axisLine: {
                         lineStyle: {
                             color: '#999'
@@ -123,7 +151,7 @@ export default {
                 series: {
                     type: 'bar',
                     barWidth: '35%',
-                    data: [300, 350, 400, 450, 500, 550, 300, 350, 400, 450, 500, 550]
+                    data
                 },
                 grid: {
                     top: 70,
@@ -131,49 +159,7 @@ export default {
                     right: 60,
                     bottom: 50
                 }
-            },
-            rank: [
-                {
-                    no: 1,
-                    name: '肯德基',
-                    money: '1000000'
-                },
-                {
-                    no: 2,
-                    name: '肯德基',
-                    money: '1000000'
-                },
-                {
-                    no: 3,
-                    name: '肯德基',
-                    money: '1000000'
-                },
-                {
-                    no: 4,
-                    name: '肯德基',
-                    money: '1000000'
-                },
-                {
-                    no: 5,
-                    name: '肯德基',
-                    money: '1000000'
-                },
-                {
-                    no: 6,
-                    name: '肯德基',
-                    money: '1000000'
-                },
-                {
-                    no: 7,
-                    name: '肯德基',
-                    money: '1000000'
-                }
-            ]
-        }
-    },
-    methods: {
-        onMenuSelect (index) {
-            this.activeIndex = index
+            }
         }
     }
 }

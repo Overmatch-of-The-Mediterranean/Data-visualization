@@ -33,6 +33,7 @@
 </template>
 
 <script>
+
 import BMapScatter from '../BMapScatter/index.vue'
 import LiquidFill from '../LiquidFill'
 import WordCloud from '../WordCloud'

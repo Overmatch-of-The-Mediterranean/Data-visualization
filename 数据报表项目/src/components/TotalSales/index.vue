@@ -1,23 +1,23 @@
 <template>
     <div>
-        <common-card title="累计销售额" value="¥ 46,901,064">
+        <common-card title="累计销售额" :value="salesToday">
             <template>
                 <div class="compare-wrapper">
                     <div class="compare">
                         <span>日同比</span>
-                        <span class="emphsis">56.34%</span>
+                        <span class="emphsis">{{salesGrowthLastDay}}</span>
                         <div class="increace"></div>
                     </div>
                     <div class="compare">
                         <span>月同比</span>
-                        <span class="emphsis">102.16%</span>
+                        <span class="emphsis">{{salesGrowthLastMonth}}</span>
                         <div class="decreace"></div>
                     </div>
                 </div>
             </template>
             <template v-slot:footer>
                 <span>昨日销售额</span>
-                <span class="emphsis"> ¥30,000,000</span>
+                <span class="emphsis"> {{ salesLastDay }}</span>
             </template>
         </common-card>
     </div>
@@ -25,9 +25,10 @@
 
 <script>
 import commonCardMixin from '../../mixins/commonCardMixin'
+import commonDataMixin from '../../mixins/commonDataMixin'
 export default {
     name: 'TotalSales',
-    mixins: [commonCardMixin]
+    mixins: [commonCardMixin, commonDataMixin]
 }
 
 </script>

@@ -30,6 +30,7 @@ import TotalOrders from '../TotalOrders'
 import TotalSales from '../TotalSales'
 import TotalUsers from '../TotalUsers'
 import TodayUsers from '../TodayUsers'
+
 export default {
     name: 'TopView',
     components: {

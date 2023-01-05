@@ -10,24 +10,24 @@
                         <div class="chart-inner">
                             <div class="chart">
                                 <div class="chart-title">搜索用户数</div>
-                                <div class="chart-data">130,596</div>
+                                <div class="chart-data">{{ userCount}}</div>
                                 <v-chart :options="searchUserOption"></v-chart>
                             </div>
                             <div class="chart">
                                 <div class="chart-title">搜索量</div>
-                                <div class="chart-data">221,003</div>
+                                <div class="chart-data">{{ searchCount}}</div>
                                 <v-chart :options="searchNumberOption"></v-chart>
                             </div>
                         </div>
                         <div class="table-wrapper">
-                            <el-table :data="tableData">
+                            <el-table :data="tableData" height="240">
                                 <el-table-column prop="rank" label="排名"></el-table-column>
                                 <el-table-column prop="keyword" label="关键词"></el-table-column>
                                 <el-table-column prop="count" label="总搜索量"></el-table-column>
                                 <el-table-column prop="users" label="搜索用户数"></el-table-column>
                                 <el-table-column prop="range" label="点击率"></el-table-column>
                             </el-table>
-                            <el-pagination background layout="prev, pager, next" :total="1000" />
+                            <el-pagination @current-change="onPageChange" :page-size="pageSize" background layout="prev, pager, next" :total="total" />
                         </div>
                     </div>
                 </template>
@@ -39,13 +39,12 @@
                     <div class="title-wrapper">
                         <div class="title">分类销售排行</div>
                         <div class="radio-wrapper">
-                            <el-radio-group v-model="radioSelect" size="small">
+                            <el-radio-group v-model="radioSelect" @change="onCategoryChange" size="small">
                                 <el-radio-button label="品类"></el-radio-button>
                                 <el-radio-button label="商品"></el-radio-button>
                             </el-radio-group>
                         </div>
                     </div>
-
                 </template>
                 <template>
                     <div class="chart-wrapper">
@@ -58,148 +57,100 @@
 </template>
 
 <script>
-
+import commonDataMixin from '../../mixins/commonDataMixin'
+const colors = ['#8d7fec', '#5085f2', '#f8726b', '#e7e702', '#78f283', '#4bc1fc']
 export default {
     name: 'BottomView',
+    mixins: [commonDataMixin],
     data () {
         return {
-            searchUserOption: {
-                xAxis: {
-                    type: 'category',
-                    boundaryGap: false
-                },
-                yAxis: {
-                    show: false,
-                    min: 0,
-                    max: 300
-                },
-                series: {
-                    type: 'line',
-                    data: [100, 150, 200, 250, 200, 150, 100, 50, 100, 150],
-                    areaStyle: {
-                        color: 'rgba(95,187,255,.5)'
-                    },
-                    lineStyle: {
-                        color: 'rgba(95,187,255,.5)'
-                    },
-                    itemStyle: {
-                        opacity: 0
-                    },
-                    smooth: true
-
-                },
-                grid: {
-                    top: 0,
-                    bottom: 0,
-                    left: 0,
-                    right: 0
-                }
-            },
-            searchNumberOption: {
-                xAxis: {
-                    type: 'category',
-                    boundaryGap: false
-                },
-                yAxis: {
-                    show: false,
-                    min: 0,
-                    max: 300
-                },
-                series: {
-                    type: 'line',
-                    data: [100, 150, 200, 250, 200, 150, 100, 50, 100, 150],
-                    areaStyle: {
-                        color: 'rgba(95,187,255,.5)'
-                    },
-                    lineStyle: {
-                        color: 'rgba(95,187,255,.5)'
-                    },
-                    itemStyle: {
-                        opacity: 0
-                    },
-                    smooth: true
-
-                },
-                grid: {
-                    top: 0,
-                    bottom: 0,
-                    left: 0,
-                    right: 0
-                }
-            },
-            tableData: [
-                {
-                    id: 1,
-                    rank: 1,
-                    keyword: '北京',
-                    count: 100,
-                    users: 90,
-                    range: '90%'
-                },
-                {
-                    id: 1,
-                    rank: 1,
-                    keyword: '北京',
-                    count: 100,
-                    users: 90,
-                    range: '90%'
-                },
-                {
-                    id: 1,
-                    rank: 1,
-                    keyword: '北京',
-                    count: 100,
-                    users: 90,
-                    range: '90%'
-                },
-                {
-                    id: 1,
-                    rank: 1,
-                    keyword: '北京',
-                    count: 100,
-                    users: 90,
-                    range: '90%'
-                }
-            ],
+            searchUserOption: {},
+            searchNumberOption: {},
+            tableData: [],
+            totalData: [],
+            userCount: 0,
+            searchCount: 0,
+            total: 0,
+            pageSize: 4,
             radioSelect: '品类',
             categoryOption: {}
         }
     },
+    watch: {
+        // 检测wordcloud的变化，调整数据格式，累加搜索和用户总量
+        wordcloud () {
+            const totalData = []
+            this.wordcloud.forEach((item, index) => {
+                totalData.push({
+                    id: index + 1,
+                    rank: index + 1,
+                    keyword: item.word,
+                    count: item.count,
+                    users: item.user,
+                    range: `${((item.user / item.count) * 100).toFixed(2)}%`
+                })
+            })
+            this.totalData = totalData
+            this.total = totalData.length
+            // 格式化并累加用户和搜索量
+            this.userCount = this.format(totalData.reduce((s, i) => i.users + s, 0))
+            this.searchCount = this.format(totalData.reduce((s, i) => i.count + s, 0))
+            this.renderLineChart()
+        },
+        category1 () {
+            this.renderPieChart()
+        }
+    },
     methods: {
+        // 品类和商品切换时触发的事件
+        onCategoryChange (type) {
+            this.radioSelect = type
+            this.renderPieChart()
+        },
+        // 跳转翻页时触发的事件
+        onPageChange (page) {
+            // 跳转翻页时，更新tableData的数据
+            this.renderTable(page)
+        },
+        // 绘制右边的饼图
         renderPieChart () {
-            const mockData = [
-                {
-                    legendname: '粉面粥店',
-                    value: 67,
-                    percent: '15.40',
+            if (!this.category1.data1 || !this.category2.data1) {
+                return
+            }
+            let data = []
+            let axis = []
+            let total = 0
+
+            if (this.radioSelect === '品类') {
+                // 品类对应的数据
+                data = this.category1.data1.slice(0, 6)
+                axis = this.category1.axisX.slice(0, 6)
+                total = data.reduce((s, i) => s + i, 0)
+            } else {
+                // 商品对应的数据
+                data = this.category2.data1.slice(0, 6)
+                axis = this.category2.axisX.slice(0, 6)
+                total = data.reduce((s, i) => s + i, 0)
+            }
+            // 饼图所需的数据
+            const chartData = []
+            data.forEach((item, index) => {
+                const percent = `${(item / total * 100).toFixed(2)}%`
+                chartData.push({
+                    legendname: axis[index],
+                    value: item,
+                    percent,
                     itemStyle: {
-                        color: '#e7e702'
+                        color: colors[index]
                     },
-                    name: '粉面粥店 | 15.40%'
-                },
-                {
-                    legendname: '简餐便当',
-                    value: 97,
-                    percent: '22.30',
-                    itemStyle: {
-                        color: '#8d7fec'
-                    },
-                    name: '简餐便当 | 22.30%'
-                },
-                {
-                    legendname: '汉堡披萨',
-                    value: 62,
-                    percent: '22.15',
-                    itemStyle: {
-                        color: '#5085f2'
-                    },
-                    name: '汉堡披萨 | 22.15%'
-                }
-            ]
+                    name: `${axis[index]} | ${percent}`
+                })
+            })
+            // 饼图的配置
             this.categoryOption = {
                 title: [
                     {
-                        text: '品类分布',
+                        text: `${this.radioSelect}分布`,
                         textStyle: {
                             fontSize: 14,
                             color: '#666'
@@ -213,7 +164,7 @@ export default {
                             fontSize: 14,
                             color: '#999'
                         },
-                        subtext: '320',
+                        subtext: total,
                         subtextStyle: {
                             fontSize: 28,
                             color: '#333'
@@ -226,7 +177,7 @@ export default {
                 series: {
                     name: '品类分布',
                     type: 'pie',
-                    data: mockData,
+                    data: chartData,
                     center: ['35%', '50%'], // 圆心位置
                     radius: ['45%', '60%'], // 第一个内半径，第二个外半径，取的是画布宽高最小的那个的百分比
                     label: {
@@ -267,11 +218,58 @@ export default {
                         const format = params.seriesName + '<br/>' +
                             params.marker + params.data.legendname + '<br/>' +
                             '数量：' + params.data.value + '<br/>' +
-                            '占比：' + params.data.percent + '%'
+                            '占比：' + params.data.percent
                         return format
                     }
                 }
             }
+        },
+        // 处理tableData数据的更新
+        renderTable (page) {
+            this.tableData = this.totalData.slice((page - 1) * this.pageSize, page * this.pageSize)
+        },
+        renderLineChart () {
+            // 封装的通用的创建配置函数
+            const createOption = (key) => {
+                const data = []
+                const axis = []
+                this.wordcloud.forEach((item) => { data.push(item[key]) })
+                this.wordcloud.forEach((item) => { axis.push(item.word) })
+                return {
+                    xAxis: {
+                        type: 'category',
+                        boundaryGap: false,
+                        data: axis
+                    },
+                    yAxis: {
+                        show: false
+                    },
+                    tooltip: {},
+                    series: {
+                        type: 'line',
+                        data,
+                        areaStyle: {
+                            color: 'rgba(95,187,255,.5)'
+                        },
+                        lineStyle: {
+                            color: 'rgba(95,187,255,.5)'
+                        },
+                        itemStyle: {
+                            opacity: 0
+                        },
+                        smooth: true
+
+                    },
+                    grid: {
+                        top: 0,
+                        bottom: 0,
+                        left: 0,
+                        right: 0
+                    }
+                }
+            }
+            this.searchUserOption = createOption('user')
+            this.searchNumberOption = createOption('count')
         }
     },
     mounted () {
@@ -338,6 +336,7 @@ export default {
                     }
 
                     .echarts {
+                        width: 100%;
                         height: 50px;
                     }
                 }
