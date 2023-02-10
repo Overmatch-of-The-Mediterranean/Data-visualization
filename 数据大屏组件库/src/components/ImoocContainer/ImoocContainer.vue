@@ -1,12 +1,9 @@
 <template>
-  <div
-    :ref="refName"
-    class="imooc-container"
-  >
-    <div v-if="ready">
-      <slot />
+    <div :ref="refName" class="imooc-container">
+        <div v-if="ready">
+            <slot />
+        </div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -24,7 +21,7 @@ export default {
         const originHeight = ref(0);
         const refName = "imooc-comtainer";
         const ready = ref(false)
-        let dom,observer;
+        let dom, observer;
 
         const init = () => {
             return new Promise((resolve) => {
@@ -67,23 +64,23 @@ export default {
             const heightScale = currentHeight / realHeight;
             dom.style.transform = `scale(${widthScale},${heightScale})`;
         };
-        const onResize = async(e) => {
-            console.log('onResize',e);
+        const onResize = async () => {
+            // console.log('onResize',e);
             await init();
             updateScale();
         };
         // 监听dom和属性的变化
-        const initMutationObserver = ()=>{
+        const initMutationObserver = () => {
             const MutationObserver = window.MutationObserver
             observer = new MutationObserver(onResize)
-            observer.observe(dom,{
-                attributes:true,
-                attributeFilter:['style'],
-                attributeOldValue:true
+            observer.observe(dom, {
+                attributes: true,
+                attributeFilter: ['style'],
+                attributeOldValue: true
             })
         }
 
-        const removeMutationObserber = ()=>{
+        const removeMutationObserber = () => {
             observer.disconnect()
             observer.takeRecords()
             observer = null
@@ -98,18 +95,18 @@ export default {
             window.addEventListener("resize", debounce(100, onResize));
             initMutationObserver()
             ready.value = true
-            console.log(
-                width.value,
-                height.value,
-                originWidth.value,
-                originHeight.value
-            );
-            console.log(
-                document.body.clientWidth,
-                document.body.clientHeight,
-                dom.clientWidth,
-                dom.clientHeight
-            );
+            // console.log(
+            //     width.value,
+            //     height.value,
+            //     originWidth.value,
+            //     originHeight.value
+            // );
+            // console.log(
+            //     document.body.clientWidth,
+            //     document.body.clientHeight,
+            //     dom.clientWidth,
+            //     dom.clientHeight
+            // );
         });
         onUnmounted(() => {
             window.removeEventListener("resize", onResize);

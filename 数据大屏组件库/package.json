@@ -36,6 +36,7 @@
     "sass": "^1.57.1"
   },
   "dependencies": {
+    "echarts": "^5.4.1",
     "nanoid": "^4.0.1",
     "uuid": "^9.0.0"
   }
