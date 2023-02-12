@@ -1,5 +1,5 @@
 {
-  "name": "datav-libs-dev",
+  "name": "datav-libs-dev-self",
   "version": "1.0.0",
   "description": "",
   "main": "dist/imooc.datav.js",
@@ -37,6 +37,7 @@
   },
   "dependencies": {
     "echarts": "^5.4.1",
+    "lodash": "^4.17.21",
     "nanoid": "^4.0.1",
     "uuid": "^9.0.0"
   }

@@ -1,38 +1,52 @@
 <template>
-    <div class="echarts"></div>
+    <div :class="[className, 'echarts']">
+    </div>
 </template>
+  
+  <script type="text/ecmascript-6">
+import { watch, onMounted } from 'vue'
+import Echarts from 'echarts' // rollup配置了外部引入echarts，所以无需npm安装echarts
+import { v4 as uuidv4 } from 'uuid'
 
-<script>
-import { ref, watch, onMounted } from 'vue'
-import * as Echarts from 'echarts';
 export default {
     name: 'VueEcharts',
+
     props: {
         options: Object,
-        theme: [Number, Object]
+        theme: [String, Object]
     },
-    setup (props) {
-        const options = ref(null)
-        let dom, chart
-        const initEcharts = () => {
+
+    setup (ctx) {
+        let dom
+        let chart
+        const className = `echarts${uuidv4()}`
+
+        const initChart = () => {
             if (!chart) {
-                dom = document.getElementsByClassName('echarts')[0]
-                chart = Echarts.init(dom, props.theme)
+                dom = document.getElementsByClassName(className)[0]
+                chart = Echarts.init(dom, ctx.theme)
             }
-            if (props.options)
-                chart.setOption(props.options)
+            ctx.options && chart.setOption(ctx.options)
         }
-        watch(() => props.options, () => {
-            initEcharts()
-            chart.setOption(props.options)
-        })
+
         onMounted(() => {
-            initEcharts()
+            initChart()
         })
+
+        watch(() => ctx.options, () => {
+            initChart()
+        })
+
+        return {
+            className
+        }
     }
-
 }
-</script>
-
-<style lang="scss" scoped>
+  </script>
+  
+  <style lang="scss" scoped>
+.echarts {
+    height: 100%;
+    width: 100%;
+}
 </style>

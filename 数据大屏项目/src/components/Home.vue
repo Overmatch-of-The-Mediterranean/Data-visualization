@@ -10,7 +10,6 @@
                 <top-header />
             </div>
             <div class="separator">
-                222
             </div>
             <div class="center">
                 <div class="left">
@@ -35,18 +34,18 @@
                 </div>
                 <div class="right">
                     <div class="right-top1">
-                        1
+                        <CenterHeader :data="headerMockData" />
                     </div>
                     <div class="right-top2">
-                        2
+                        <TransformCategory :data="['All','北京','上海','深圳','杭州','南京','武汉']" />
                     </div>
                     <div class="right-bottom">
                         <div class="right-left">
                             <div class="right-left1">
-                                999
+                                <!-- <BaseScrollList /> -->
                             </div>
                             <div class="right-left2">
-                                10
+                                <TransformCategory :data="['订单量','销售额','用户数','退单量']" :color="['rgb(178,209,126)','rgb(116,166,49)']" />
                             </div>
                             <div class="right-left3">
                                 11
@@ -80,6 +79,8 @@ import TotalDevice from './TotalDevice/index.vue'
 import TotalGender from './TotalGender/index.vue'
 import TotalRider from './TotalRider/index.vue'
 import HotCategory from './HotCategory/index.vue'
+import CenterHeader from './CenterHeader/index.vue'
+import TransformCategory from './TransformCategory/index.vue'
 export default {
     name: 'Home',
     components: {
@@ -89,7 +90,9 @@ export default {
         TotalDevice,
         TotalGender,
         TotalRider,
-        HotCategory
+        HotCategory,
+        CenterHeader,
+        TransformCategory
     },
     setup () {
         const options = ref(null)
@@ -153,7 +156,6 @@ export default {
             display: flex;
             width: 100%;
             flex: 1;
-            background: rebeccapurple;
             .left {
                 display: flex;
                 flex-direction: column;
@@ -161,48 +163,50 @@ export default {
                 justify-content: space-between;
                 width: 860px;
                 height: 100%;
-                background: red;
-                padding-bottom: 20px;
+                margin: 0 10px;
+                background: rgb(60, 61, 64);
+
                 box-sizing: border-box;
+                .left1,
+                .left2,
+                .left3,
+                .left4,
+                .left5,
+                .left6 {
+                    padding-bottom: 20px;
+                }
                 .left1 {
                     height: 300px;
-                    background: green;
                 }
                 .left2 {
                     height: 320px;
-                    background: yellow;
                 }
                 .left3 {
                     height: 280px;
-                    background: blueviolet;
                 }
                 .left4 {
                     height: 230px;
-                    background: mediumpurple;
                 }
                 .left5 {
                     height: 360px;
-                    background: pink;
                 }
                 .left6 {
                     height: 360px;
-                    background: darkred;
                 }
             }
             .right {
                 display: flex;
                 flex-direction: column;
                 flex: 1;
-                background: blue;
+                margin-left: 10px;
                 .right-top1 {
                     height: 206px;
                     width: 100%;
-                    background: darkred;
                 }
                 .right-top2 {
                     height: 48px;
                     width: 100%;
-                    background: cadetblue;
+                    margin: 10px 0;
                 }
                 .right-bottom {
                     flex: 1;
@@ -216,19 +220,15 @@ export default {
                         width: 1917px;
                         .right-left1 {
                             height: 999px;
-                            background: red;
                         }
                         .right-left2 {
                             height: 80px;
-                            background: yellowgreen;
                         }
                         .right-left3 {
                             height: 350px;
-                            background: deepskyblue;
                         }
                         .right-left4 {
                             height: 220px;
-                            background: orangered;
                         }
                     }
                     .right-right {
@@ -240,14 +240,12 @@ export default {
                         .right-right1 {
                             width: 100%;
                             height: 999px;
-                            background: burlywood;
                         }
                         .right-right2 {
                             flex: 1;
                             width: 100%;
                             height: 650px;
                             margin-top: 20px;
-                            background: darkred;
                         }
                     }
                 }

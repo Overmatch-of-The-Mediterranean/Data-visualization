@@ -1,6 +1,6 @@
 <template>
-    <div :ref="refName" class="imooc-container">
-        <div v-if="ready">
+    <div :ref="refName" id="imooc-container">
+        <div :style="{width:'100%',height:'100%'}" v-if="ready">
             <slot />
         </div>
     </div>
@@ -62,7 +62,7 @@ export default {
             // 放大视口尺寸变小，real不变,则scale缩小，dom的大小也跟着缩小
             const widthScale = currentWidth / realWidth;
             const heightScale = currentHeight / realHeight;
-            dom.style.transform = `scale(${widthScale},${heightScale})`;
+            dom && (dom.style.transform = `scale(${widthScale},${heightScale})`);
         };
         const onResize = async () => {
             // console.log('onResize',e);
@@ -81,9 +81,12 @@ export default {
         }
 
         const removeMutationObserber = () => {
-            observer.disconnect()
-            observer.takeRecords()
-            observer = null
+            if (observer) {
+                observer.disconnect()
+                observer.takeRecords()
+                observer = null
+            }
+
         }
         onMounted(async () => {
             ready.value = false
@@ -95,6 +98,7 @@ export default {
             window.addEventListener("resize", debounce(100, onResize));
             initMutationObserver()
             ready.value = true
+
             // console.log(
             //     width.value,
             //     height.value,
@@ -121,7 +125,7 @@ export default {
 </script>
 
 <style lang='scss' scoped>
-.imooc-container {
+#imooc-container {
     position: fixed;
     left: 0;
     top: 0;
