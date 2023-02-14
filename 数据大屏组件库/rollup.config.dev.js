@@ -32,5 +32,5 @@ module.exports = {
         })
     ],
     
-    external:['vue','echarts']
+    external:['vue']
 }

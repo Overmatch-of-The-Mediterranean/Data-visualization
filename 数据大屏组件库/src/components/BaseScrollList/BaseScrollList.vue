@@ -4,8 +4,8 @@
             <div class="header-item base-scroll-list-text" :align="aligns[index]" v-for="(item,index) in headerData" :key="item+index" :style="{width:`${columnsWidths[index]}px`,...headerStyle[index]}" v-html="item"></div>
         </div>
         <div class="base-scroll-list-rows-wrapper" :style="{height:`${height - actualConfig.headerHeight}px`}">
-            <div class="base-scroll-list-rows" v-for="(rowItem,rowIndex) in currentRowsData" :key="rowItem+rowIndex" :style="{height:`${rowsHeights[rowIndex]}px`,fontSize:`${actualConfig.rowFontSize}px`,backgroundColor: rowIndex%2===0 ? rowBgc[1]:rowBgc[0],color:actualConfig.rowColor}">
-                <div class="base-scroll-list-columns" v-for="(colItem,colIndex) in rowItem" :key="colItem+colIndex" :align="aligns[colIndex]" :style="{width:`${columnsWidths[colIndex]}px`,...rowStyle[colIndex]}" v-html="colItem">
+            <div class="base-scroll-list-rows" v-for="(rowItem,rowIndex) in currentRowsData" :key="rowItem.data+rowIndex" :style="{height:`${rowsHeights[rowIndex]}px`,lineHeight:`${rowsHeights[rowIndex]}px`,fontSize:`${actualConfig.rowFontSize}px`,backgroundColor: rowItem.rowIndex%2===0 ? rowBgc[1]:rowBgc[0],color:actualConfig.rowColor}">
+                <div class="base-scroll-list-columns base-scroll-list-text" v-for="(colItem,colIndex) in rowItem.data" :key="colItem+colIndex" :align="aligns[colIndex]" :style="{width:`${columnsWidths[colIndex]}px`,...rowStyle[colIndex]}" v-html="colItem">
 
                 </div>
             </div>
@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, watch } from 'vue'
 import useScreen from '../../hooks/useScreen'
 import { v4 as uuidv4 } from 'uuid';
 import cloneDeep from 'lodash/cloneDeep'
@@ -60,17 +60,20 @@ export default {
             headerColor: '#fff',
             rowColor: '#000',
             moveNum: 1, // 移动行数
-            durtion: 2000
+            durtion: 2000,
+            headerIndexData: []
         })
         const actualConfig = ref({})
         // 数据修改并备份，不在原数据上进行操作
         const columnsWidths = ref([])
         const rowsHeights = ref([])
         const rowData = ref([])
-        const rowNum = ref(props.config.rowNum)
+        const rowNum = ref(0)
         const aligns = ref([])
         const currentRowsData = ref([])
         const currentIndex = ref(0)
+        let avgHeight
+        const isAnimationStart = ref(true)
         const handleHeader = (config) => {
             const _headerData = cloneDeep(config.header)
             const _headerStyle = cloneDeep(config.headerStyle)
@@ -87,8 +90,13 @@ export default {
                 _rowStyle.unshift(config.rowIndexStyle)
                 _aligns.unshift('center')
                 _rowData.forEach((item, index) => {
-                    item.unshift(index + 1)
+                    if (config.headerIndexData && config.headerIndexData.length > 0 && config.headerIndexData[index]) {
+                        item.unshift(config.headerIndexData[index])
+                    } else {
+                        item.unshift(index + 1)
+                    }
                 })
+                console.log(_rowData, '_rowData');
             }
             let useWidth = 0, useWidthNum = 0
             _headerStyle.forEach(item => {
@@ -108,7 +116,26 @@ export default {
                     _columnsWidths[index] = columnWidth
                 }
             })
-            rowData.value = _rowData
+
+            // 双份数据，使滚动效果更流畅
+            const { rowNum } = config
+            if (_rowData.length >= rowNum && _rowData.length < 2 * rowNum) {
+                const newRowData = [..._rowData, ..._rowData]
+                rowData.value = newRowData.map((item, index) => (
+                    {
+                        data: item,
+                        rowIndex: index
+                    }
+                ))
+            } else {
+                rowData.value = _rowData.map((item, index) => (
+                    {
+                        data: item,
+                        rowIndex: index
+                    }
+                ))
+            }
+
             columnsWidths.value = _columnsWidths
             headerData.value = _headerData
             headerStyle.value = _headerStyle
@@ -118,20 +145,22 @@ export default {
         }
         const handleRows = (config) => {
             const { headerHeight } = config
+            rowNum.value = config.rowNum
             const noUseHeight = height.value - headerHeight
             if (rowNum.value > rowData.value.length) {
                 rowNum.value = rowData.value.length
 
             }
-            const avgHeight = noUseHeight / rowNum.value
+            avgHeight = noUseHeight / rowNum.value
             rowsHeights.value = new Array(rowNum.value).fill(avgHeight)
         }
         // rows移动变换逻辑
         const startAnimation = async () => {
+            if (!isAnimationStart) return
             const config = actualConfig.value
-            // console.log(config);
-            const { data, rowNum, moveNum, durtion } = config
-            if (data.length < rowNum) {
+            const { rowNum, moveNum, durtion } = config
+            const totalLength = rowData.value.length
+            if (totalLength < rowNum) {
                 return
             }
             const index = currentIndex.value
@@ -141,20 +170,45 @@ export default {
             rows.push(..._rowData.slice(0, index))
             currentRowsData.value = rows
             currentIndex.value += moveNum
-            // sleep
+
+            // 还原所有row的高度
+            rowsHeights.value = new Array(totalLength).fill(avgHeight)
+            if (!isAnimationStart) return
             await new Promise(resolve =>
-                setTimeout(resolve, durtion)
+                setTimeout(resolve, 300)
+            )
+            // 让moveNum的高度为零
+            rowsHeights.value.splice(0, moveNum, ...new Array(moveNum).fill(0))
+
+            // 首尾相连
+            const isLast = currentIndex.value - totalLength
+            if (isLast >= 0) {
+                currentIndex.value = isLast
+            }
+
+            // sleep
+            if (!isAnimationStart) return
+            await new Promise(resolve =>
+                setTimeout(resolve, durtion - 300)
             )
             startAnimation()
         }
-        onMounted(() => {
+        const stopAnimation = () => {
+            isAnimationStart.value = false
+        }
+        const update = () => {
+            stopAnimation()
             // 默认参数与实际参数合并
             rowData.value = props.config.data || []
             const _actualConfig = assign(defaultConfig.value, props.config)
             handleHeader(_actualConfig)
             handleRows(_actualConfig)
             actualConfig.value = _actualConfig
+            isAnimationStart.value = true
             startAnimation()
+        }
+        watch(() => props.config, () => {
+            update()
         })
         return {
             id,
@@ -179,17 +233,17 @@ export default {
 .base-scroll-list {
     width: 100%;
     height: 100%;
+    .base-scroll-list-text {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        box-sizing: border-box;
+    }
     .base-scroll-list-header {
         display: flex;
         font-size: 15px;
         align-items: center;
-        .base-scroll-list-text {
-            padding: 0 10px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            box-sizing: border-box;
-        }
+
         .header-item {
             width: 150px;
         }
@@ -199,7 +253,10 @@ export default {
         .base-scroll-list-rows {
             display: flex;
             align-items: center;
+            transition: all 0.3s linear;
             .base-scroll-list-columns {
+                height: 100%;
+                color: #fff;
             }
         }
     }
