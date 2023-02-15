@@ -42,7 +42,7 @@
                     <div class="right-bottom">
                         <div class="right-left">
                             <div class="right-left1">
-                                <!-- <BaseScrollList /> -->
+                                <OrderMap></OrderMap>
                             </div>
                             <div class="right-left2">
                                 <TransformCategory :data="['订单量','销售额','用户数','退单量']" :color="['rgb(178,209,126)','rgb(116,166,49)']" />
@@ -82,6 +82,7 @@ import HotCategory from './HotCategory/index.vue'
 import CenterHeader from './CenterHeader/index.vue'
 import TransformCategory from './TransformCategory/index.vue'
 import SalesList from './SalesList/index.vue'
+import OrderMap from './OrderMap/index.vue'
 export default {
     name: 'Home',
     components: {
@@ -94,7 +95,8 @@ export default {
         HotCategory,
         CenterHeader,
         TransformCategory,
-        SalesList
+        SalesList,
+        OrderMap
     },
     setup () {
         const options = ref(null)

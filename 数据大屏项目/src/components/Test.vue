@@ -1,16 +1,17 @@
 <template>
     <div :style="{width:'100%',height:'100%'}">
         <!-- <GdpTimelineChart></GdpTimelineChart> -->
-        <JiangsuMapWarning></JiangsuMapWarning>
+        <OrderMap></OrderMap>
     </div>
 </template>
 
 <script>
 // import { ref } from 'vue'
-import JiangsuMapWarning from './JiangsuMapWarning/index.vue'
+import OrderMap from './OrderMap/index.vue'
+// import JiangsuMapWarning from './JiangsuMapWarning/index.vue'
 export default {
     name: 'Test',
-    components: { JiangsuMapWarning },
+    components: { OrderMap },
     setup () {
     }
 }
