@@ -96,7 +96,6 @@ export default {
                         item.unshift(index + 1)
                     }
                 })
-                console.log(_rowData, '_rowData');
             }
             let useWidth = 0, useWidthNum = 0
             _headerStyle.forEach(item => {

@@ -48,7 +48,7 @@ export default {
         }
         onMounted(() => {
             update()
-            console.log(props.data.project, '11111');
+            // console.log(props.data.project, '11111');
         })
         watch(() => props.data, () => {
             update()

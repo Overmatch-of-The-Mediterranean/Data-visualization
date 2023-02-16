@@ -19,5 +19,4 @@ const router = createRouter({
     history:createWebHashHistory(),
     routes
 })
-console.log(router);
 export default  router

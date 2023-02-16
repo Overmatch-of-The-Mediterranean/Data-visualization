@@ -353,7 +353,6 @@ export default {
                         }
                         return res
                     }
-                    console.log(mapData, barData, categoryData);
                     echarts.registerMap('china', data)
                     const _options = {
                         timeline: {

@@ -99,7 +99,7 @@ export default {
                                     show: true,
                                     position: 'top',
                                     formatter: function (params) {
-                                        console.log(params, 'params');
+                                        // console.log(params, 'params');
                                         return `{title|${params.data.city}}\n{content|发生xx事情}`
                                     },
                                     backgroundColor: 'rgba(254,174,33,.8)',
@@ -131,7 +131,7 @@ export default {
                                     show: true,
                                     position: 'top',
                                     formatter: function (params) {
-                                        console.log(params, 'params');
+                                        // console.log(params, 'params');
                                         return `{title|${params.data.city}}\n{content|发生xx事情}`
                                     },
                                     backgroundColor: 'rgba(233,63,66,.9)',
@@ -163,7 +163,7 @@ export default {
                                     show: true,
                                     position: 'top',
                                     formatter: function (params) {
-                                        console.log(params, 'params');
+                                        // console.log(params, 'params');
                                         return `{title|${params.data.city}}\n{content|发生xx事情}`
                                     },
                                     backgroundColor: 'rgba(8,186,236,.9)',

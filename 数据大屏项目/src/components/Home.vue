@@ -48,10 +48,10 @@
                                 <TransformCategory :data="['订单量','销售额','用户数','退单量']" :color="['rgb(178,209,126)','rgb(116,166,49)']" />
                             </div>
                             <div class="right-left3">
-                                11
+                                <RealTimeOrder :data="realTimeOrderData"></RealTimeOrder>
                             </div>
                             <div class="right-left4">
-                                11
+                                <Calender></Calender>
                             </div>
                         </div>
                         <div class="right-right">
@@ -59,7 +59,7 @@
                                 <SalesList :data="salesListData" />
                             </div>
                             <div class="right-right2">
-                                13
+                                <SalesRank :data="salesRankData"></SalesRank>
                             </div>
                         </div>
                     </div>
@@ -83,6 +83,9 @@ import CenterHeader from './CenterHeader/index.vue'
 import TransformCategory from './TransformCategory/index.vue'
 import SalesList from './SalesList/index.vue'
 import OrderMap from './OrderMap/index.vue'
+import RealTimeOrder from './RealTimeOrder/index.vue'
+import Calender from './Calender/index.vue'
+import SalesRank from './SalesRank/index.vue'
 export default {
     name: 'Home',
     components: {
@@ -96,7 +99,10 @@ export default {
         CenterHeader,
         TransformCategory,
         SalesList,
-        OrderMap
+        OrderMap,
+        RealTimeOrder,
+        Calender,
+        SalesRank
     },
     setup () {
         const options = ref(null)
@@ -113,7 +119,6 @@ export default {
         }
         const loading = ref(true)
         const screenData = useScreenData()
-        // console.log(screenData);
         onMounted(() => {
             setTimeout(() => {
                 loading.value = false
